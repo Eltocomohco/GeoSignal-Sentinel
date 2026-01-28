@@ -3,16 +3,17 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i3;
+import 'dart:async' as _i4;
 
-import 'package:fpdart/fpdart.dart' as _i4;
-import 'package:geosignal_sentinel/core/error/failures.dart' as _i5;
+import 'package:fpdart/fpdart.dart' as _i5;
+import 'package:geosignal_sentinel/core/error/failures.dart' as _i6;
 import 'package:geosignal_sentinel/features/positioning/domain/entities/position.dart'
-    as _i6;
+    as _i7;
 import 'package:geosignal_sentinel/features/positioning/domain/repositories/location_repository.dart'
     as _i2;
+import 'package:geosignal_sentinel/features/positioning/domain/usecases/get_live_position_usecase.dart'
+    as _i3;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i7;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -29,94 +30,38 @@ import 'package:mockito/src/dummies.dart' as _i7;
 // ignore_for_file: subtype_of_sealed_class
 // ignore_for_file: invalid_use_of_internal_member
 
-/// A class which mocks [LocationRepository].
+class _FakeLocationRepository_0 extends _i1.SmartFake
+    implements _i2.LocationRepository {
+  _FakeLocationRepository_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+/// A class which mocks [GetLivePositionUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocationRepository extends _i1.Mock
-    implements _i2.LocationRepository {
-  MockLocationRepository() {
+class MockGetLivePositionUseCase extends _i1.Mock
+    implements _i3.GetLivePositionUseCase {
+  MockGetLivePositionUseCase() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i3.Stream<_i4.Either<_i5.Failure, _i6.Position>> getPositionStream({
-    int? intervalMs = 1000,
-    int? distanceFilterMeters = 0,
-  }) =>
+  _i2.LocationRepository get repository =>
       (super.noSuchMethod(
-            Invocation.method(#getPositionStream, [], {
-              #intervalMs: intervalMs,
-              #distanceFilterMeters: distanceFilterMeters,
-            }),
-            returnValue:
-                _i3.Stream<_i4.Either<_i5.Failure, _i6.Position>>.empty(),
-          )
-          as _i3.Stream<_i4.Either<_i5.Failure, _i6.Position>>);
-
-  @override
-  _i3.Future<_i4.Either<_i5.Failure, _i6.Position>> getCurrentPosition() =>
-      (super.noSuchMethod(
-            Invocation.method(#getCurrentPosition, []),
-            returnValue:
-                _i3.Future<_i4.Either<_i5.Failure, _i6.Position>>.value(
-                  _i7.dummyValue<_i4.Either<_i5.Failure, _i6.Position>>(
-                    this,
-                    Invocation.method(#getCurrentPosition, []),
-                  ),
-                ),
-          )
-          as _i3.Future<_i4.Either<_i5.Failure, _i6.Position>>);
-
-  @override
-  _i3.Future<_i4.Either<_i5.Failure, _i6.Position?>> getLastKnownPosition() =>
-      (super.noSuchMethod(
-            Invocation.method(#getLastKnownPosition, []),
-            returnValue:
-                _i3.Future<_i4.Either<_i5.Failure, _i6.Position?>>.value(
-                  _i7.dummyValue<_i4.Either<_i5.Failure, _i6.Position?>>(
-                    this,
-                    Invocation.method(#getLastKnownPosition, []),
-                  ),
-                ),
-          )
-          as _i3.Future<_i4.Either<_i5.Failure, _i6.Position?>>);
-
-  @override
-  _i3.Future<_i4.Either<_i5.Failure, bool>> isLocationServiceEnabled() =>
-      (super.noSuchMethod(
-            Invocation.method(#isLocationServiceEnabled, []),
-            returnValue: _i3.Future<_i4.Either<_i5.Failure, bool>>.value(
-              _i7.dummyValue<_i4.Either<_i5.Failure, bool>>(
-                this,
-                Invocation.method(#isLocationServiceEnabled, []),
-              ),
+            Invocation.getter(#repository),
+            returnValue: _FakeLocationRepository_0(
+              this,
+              Invocation.getter(#repository),
             ),
           )
-          as _i3.Future<_i4.Either<_i5.Failure, bool>>);
+          as _i2.LocationRepository);
 
   @override
-  _i3.Future<_i4.Either<_i5.Failure, bool>> checkPermission() =>
+  _i4.Stream<_i5.Either<_i6.Failure, _i7.Position>> call() =>
       (super.noSuchMethod(
-            Invocation.method(#checkPermission, []),
-            returnValue: _i3.Future<_i4.Either<_i5.Failure, bool>>.value(
-              _i7.dummyValue<_i4.Either<_i5.Failure, bool>>(
-                this,
-                Invocation.method(#checkPermission, []),
-              ),
-            ),
+            Invocation.method(#call, []),
+            returnValue:
+                _i4.Stream<_i5.Either<_i6.Failure, _i7.Position>>.empty(),
           )
-          as _i3.Future<_i4.Either<_i5.Failure, bool>>);
-
-  @override
-  _i3.Future<_i4.Either<_i5.Failure, bool>> requestPermission() =>
-      (super.noSuchMethod(
-            Invocation.method(#requestPermission, []),
-            returnValue: _i3.Future<_i4.Either<_i5.Failure, bool>>.value(
-              _i7.dummyValue<_i4.Either<_i5.Failure, bool>>(
-                this,
-                Invocation.method(#requestPermission, []),
-              ),
-            ),
-          )
-          as _i3.Future<_i4.Either<_i5.Failure, bool>>);
+          as _i4.Stream<_i5.Either<_i6.Failure, _i7.Position>>);
 }

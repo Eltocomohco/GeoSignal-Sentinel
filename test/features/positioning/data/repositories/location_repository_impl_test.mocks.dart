@@ -5,6 +5,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
+import 'package:geosignal_sentinel/features/positioning/data/datasources/local/local_location_datasource.dart'
+    as _i5;
 import 'package:geosignal_sentinel/features/positioning/data/datasources/location_datasource.dart'
     as _i3;
 import 'package:geosignal_sentinel/features/positioning/data/models/position_dto.dart'
@@ -98,4 +100,33 @@ class MockLocationDataSource extends _i1.Mock
             returnValue: _i4.Future<bool>.value(false),
           )
           as _i4.Future<bool>);
+}
+
+/// A class which mocks [LocalLocationDataSource].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockLocalLocationDataSource extends _i1.Mock
+    implements _i5.LocalLocationDataSource {
+  MockLocalLocationDataSource() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Future<void> savePosition(_i2.PositionDto? position) =>
+      (super.noSuchMethod(
+            Invocation.method(#savePosition, [position]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<List<_i2.PositionDto>> getHistory() =>
+      (super.noSuchMethod(
+            Invocation.method(#getHistory, []),
+            returnValue: _i4.Future<List<_i2.PositionDto>>.value(
+              <_i2.PositionDto>[],
+            ),
+          )
+          as _i4.Future<List<_i2.PositionDto>>);
 }
