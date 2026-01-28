@@ -35,24 +35,28 @@ void main() {
     accuracy: 5.0,
     timestamp: tTimestamp,
     provider: LocationProviderType.gps,
+    altitude: 0,
+    heading: 0,
+    speed: 0,
+    isMocked: false,
   );
   final Position tPosition = tPositionDto;
 
   group('getCurrentPosition', () {
     test('should return Position when call to data source is successful', () async {
       // Arrange
-      when(mockDataSource.getCurrentPosition()).thenAnswer((_) async => tPositionDto);
+      when(mockRemoteDataSource.getCurrentPosition()).thenAnswer((_) async => tPositionDto);
       // Act
       final result = await repository.getCurrentPosition();
       // Assert
       expect(result, Right(tPosition));
-      verify(mockDataSource.getCurrentPosition());
-      verifyNoMoreInteractions(mockDataSource);
+      verify(mockRemoteDataSource.getCurrentPosition());
+      verifyNoMoreInteractions(mockRemoteDataSource);
     });
 
     test('should return LocationFailure when call to data source throws ServerException', () async {
       // Arrange
-      when(mockDataSource.getCurrentPosition()).thenThrow(ServerException('Error'));
+      when(mockRemoteDataSource.getCurrentPosition()).thenThrow(ServerException('Error'));
       // Act
       final result = await repository.getCurrentPosition();
       // Assert
@@ -63,8 +67,11 @@ void main() {
   group('getPositionStream', () {
       test('should emit Position when stream emits successfully', () async {
         // Arrange
-        when(mockDataSource.getPositionStream(intervalMs: anyNamed('intervalMs'), distanceFilterMeters: anyNamed('distanceFilterMeters')))
+        when(mockRemoteDataSource.getPositionStream(intervalMs: anyNamed('intervalMs'), distanceFilterMeters: anyNamed('distanceFilterMeters')))
             .thenAnswer((_) => Stream.value(tPositionDto));
+            
+        // Stub local save to avoid null errors (Fire-and-forget)
+        when(mockLocalDataSource.savePosition(any)).thenAnswer((_) async => {});
         
         // Act
         final stream = repository.getPositionStream();
@@ -76,7 +83,7 @@ void main() {
       test('should emit LocationFailure when stream emits error', () async {
          // Arrange
         final controller = StreamController<PositionDto>();
-        when(mockDataSource.getPositionStream(intervalMs: anyNamed('intervalMs'), distanceFilterMeters: anyNamed('distanceFilterMeters')))
+        when(mockRemoteDataSource.getPositionStream(intervalMs: anyNamed('intervalMs'), distanceFilterMeters: anyNamed('distanceFilterMeters')))
             .thenAnswer((_) => controller.stream);
 
         // Act
