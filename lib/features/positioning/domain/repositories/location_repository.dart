@@ -20,6 +20,9 @@ abstract class LocationRepository {
     int distanceFilterMeters = 0,
   });
 
+  /// Get full history
+  Future<Either<Failure, List<Position>>> getHistory();
+
   /// Gets a single high-accuracy position.
   /// Useful for "Audit Snapshots".
   Future<Either<Failure, Position>> getCurrentPosition();

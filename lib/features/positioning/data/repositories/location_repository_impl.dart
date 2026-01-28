@@ -91,4 +91,17 @@ class LocationRepositoryImpl implements LocationRepository {
       return Left(PermissionFailure(e.toString()));
     }
   }
+  @override
+  Future<Either<Failure, List<Position>>> getHistory() async {
+    try {
+      final dtos = await localDataSource.getHistory();
+      // Dtos are implicitly castable to Position if your Mapper/Entity setup allows,
+      // or we explicitly map them. PositionDto extends Position in our setup? Let's check.
+      // Assuming PositionDto extends/implements Position or we use the cast.
+      // Dto to Entity Conversion
+      return Right(dtos); 
+    } catch (e) {
+      return Left(LocationFailure(e.toString()));
+    }
+  }
 }

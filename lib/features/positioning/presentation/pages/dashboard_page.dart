@@ -6,23 +6,19 @@ import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
 import '../bloc/signal/signal_bloc.dart';
 import '../bloc/signal/signal_event.dart';
+import '../bloc/signal/signal_event.dart';
 import '../bloc/location_state.dart';
 import '../widgets/position_card.dart';
 import '../widgets/signal_monitor.dart';
+import 'history_page.dart';
+import 'map_page.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => sl<LocationBloc>()),
-        // Inyectamos y arrancamos el escáner inmediatamente para la demo
-        BlocProvider(create: (_) => sl<SignalBloc>()..add(const SignalScanStarted())),
-      ],
-      child: const _DashboardView(),
-    );
+    return const _DashboardView();
   }
 }
 
@@ -36,11 +32,22 @@ class _DashboardView extends StatelessWidget {
         title: const Text('GeoSignal Sentinel'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.history),
             onPressed: () {
-              // TODO: Navegar a configuración
+               Navigator.of(context).push(
+                 MaterialPageRoute(builder: (_) => const HistoryPage()),
+               );
             },
-          )
+          ),
+          IconButton(
+            icon: const Icon(Icons.map),
+            tooltip: 'Ver Mapa',
+            onPressed: () {
+               Navigator.of(context).push(
+                 MaterialPageRoute(builder: (_) => const MapPage()),
+               );
+            },
+          ),
         ],
       ),
       body: BlocConsumer<LocationBloc, LocationState>(
@@ -107,9 +114,13 @@ class _DashboardView extends StatelessWidget {
           return FloatingActionButton.extended(
             onPressed: () {
               if (isTracking) {
+                // Detener ambos sensores
                 context.read<LocationBloc>().add(const LocationStopped());
+                context.read<SignalBloc>().add(const SignalScanStopped());
               } else {
+                // Iniciar ambos sensores
                 context.read<LocationBloc>().add(const LocationStarted());
+                context.read<SignalBloc>().add(const SignalScanStarted());
               }
             },
             backgroundColor: isTracking ? Colors.red : Colors.green,

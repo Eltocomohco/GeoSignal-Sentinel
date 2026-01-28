@@ -12,7 +12,10 @@ import 'features/positioning/domain/repositories/location_repository.dart';
 import 'features/positioning/domain/repositories/signal_repository.dart';
 import 'features/positioning/domain/repositories/signal_repository.dart';
 import 'features/positioning/domain/repositories/signal_repository.dart';
+import 'features/positioning/domain/usecases/export_history_usecase.dart';
+import 'features/positioning/domain/usecases/get_history_usecase.dart';
 import 'features/positioning/domain/usecases/get_live_position_usecase.dart';
+import 'features/positioning/presentation/bloc/history/history_bloc.dart';
 import 'features/positioning/presentation/bloc/location_bloc.dart';
 import 'features/positioning/presentation/bloc/signal/signal_bloc.dart';
 
@@ -22,10 +25,13 @@ Future<void> init() async {
   // Features - Positioning
   // UseCases
   sl.registerLazySingleton(() => GetLivePositionUseCase(sl()));
+  sl.registerLazySingleton(() => GetHistoryUseCase(sl()));
+  sl.registerLazySingleton(() => ExportHistoryUseCase());
 
   // Bloc
   sl.registerFactory(() => LocationBloc(getLivePosition: sl()));
   sl.registerFactory(() => SignalBloc(repository: sl()));
+  sl.registerFactory(() => HistoryBloc(getHistory: sl(), exportHistory: sl()));
 
   // Repository
   sl.registerLazySingleton<LocationRepository>(

@@ -1,5 +1,5 @@
 import 'database/app_database.dart';
-import '../../models/position_dto.dart';
+import 'package:geosignal_sentinel/features/positioning/data/models/position_dto.dart';
 import 'local_location_datasource.dart';
 
 class DriftLocationDataSource implements LocalLocationDataSource {
