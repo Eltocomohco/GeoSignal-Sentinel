@@ -7,19 +7,25 @@ import 'package:geosignal_sentinel/core/error/exceptions.dart';
 import 'package:geosignal_sentinel/core/error/failures.dart';
 import 'package:geosignal_sentinel/features/positioning/data/datasources/location_datasource.dart';
 import 'package:geosignal_sentinel/features/positioning/data/models/position_dto.dart';
+import 'package:geosignal_sentinel/features/positioning/data/datasources/local/local_location_datasource.dart';
 import 'package:geosignal_sentinel/features/positioning/data/repositories/location_repository_impl.dart';
 import 'package:geosignal_sentinel/features/positioning/domain/entities/position.dart';
 
 import 'location_repository_impl_test.mocks.dart';
 
-@GenerateMocks([LocationDataSource])
+@GenerateMocks([LocationDataSource, LocalLocationDataSource])
 void main() {
   late LocationRepositoryImpl repository;
-  late MockLocationDataSource mockDataSource;
+  late MockLocationDataSource mockRemoteDataSource;
+  late MockLocalLocationDataSource mockLocalDataSource;
 
   setUp(() {
-    mockDataSource = MockLocationDataSource();
-    repository = LocationRepositoryImpl(remoteDataSource: mockDataSource);
+    mockRemoteDataSource = MockLocationDataSource();
+    mockLocalDataSource = MockLocalLocationDataSource();
+    repository = LocationRepositoryImpl(
+      remoteDataSource: mockRemoteDataSource,
+      localDataSource: mockLocalDataSource,
+    );
   });
 
   final tTimestamp = DateTime.now();

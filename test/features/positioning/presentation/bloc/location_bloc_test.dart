@@ -5,21 +5,21 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:geosignal_sentinel/features/positioning/domain/entities/position.dart';
-import 'package:geosignal_sentinel/features/positioning/domain/repositories/location_repository.dart';
+import 'package:geosignal_sentinel/features/positioning/domain/usecases/get_live_position_usecase.dart';
 import 'package:geosignal_sentinel/features/positioning/presentation/bloc/location_bloc.dart';
 import 'package:geosignal_sentinel/features/positioning/presentation/bloc/location_event.dart';
 import 'package:geosignal_sentinel/features/positioning/presentation/bloc/location_state.dart';
 
 import 'location_bloc_test.mocks.dart';
 
-@GenerateMocks([LocationRepository])
+@GenerateMocks([GetLivePositionUseCase])
 void main() {
   late LocationBloc bloc;
-  late MockLocationRepository mockRepository;
+  late MockGetLivePositionUseCase mockUseCase;
 
   setUp(() {
-    mockRepository = MockLocationRepository();
-    bloc = LocationBloc(locationRepository: mockRepository);
+    mockUseCase = MockGetLivePositionUseCase();
+    bloc = LocationBloc(getLivePosition: mockUseCase);
   });
 
   tearDown(() {
@@ -36,12 +36,17 @@ void main() {
       longitude: 1.0,
       accuracy: 1.0,
       timestamp: DateTime.now(),
+      altitude: 0,
+      heading: 0,
+      speed: 0,
+      isMocked: false,
+      provider: LocationProviderType.gps,
     );
 
     blocTest<LocationBloc, LocationState>(
-      'emits [loading, success] when repository returns position stream successfully',
+      'emits [loading, success] when usecase returns position stream',
       build: () {
-        when(mockRepository.getPositionStream())
+        when(mockUseCase.call())
             .thenAnswer((_) => Stream.value(Right(tPosition)));
         return bloc;
       },
