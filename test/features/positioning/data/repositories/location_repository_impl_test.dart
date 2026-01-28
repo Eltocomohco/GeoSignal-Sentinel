@@ -1,0 +1,86 @@
+import 'dart:async';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:geosignal_sentinel/core/error/exceptions.dart';
+import 'package:geosignal_sentinel/core/error/failures.dart';
+import 'package:geosignal_sentinel/features/positioning/data/datasources/location_datasource.dart';
+import 'package:geosignal_sentinel/features/positioning/data/models/position_dto.dart';
+import 'package:geosignal_sentinel/features/positioning/data/repositories/location_repository_impl.dart';
+import 'package:geosignal_sentinel/features/positioning/domain/entities/position.dart';
+
+import 'location_repository_impl_test.mocks.dart';
+
+@GenerateMocks([LocationDataSource])
+void main() {
+  late LocationRepositoryImpl repository;
+  late MockLocationDataSource mockDataSource;
+
+  setUp(() {
+    mockDataSource = MockLocationDataSource();
+    repository = LocationRepositoryImpl(remoteDataSource: mockDataSource);
+  });
+
+  final tTimestamp = DateTime.now();
+  final tPositionDto = PositionDto(
+    latitude: 10.0,
+    longitude: 20.0,
+    accuracy: 5.0,
+    timestamp: tTimestamp,
+    provider: LocationProviderType.gps,
+  );
+  final Position tPosition = tPositionDto;
+
+  group('getCurrentPosition', () {
+    test('should return Position when call to data source is successful', () async {
+      // Arrange
+      when(mockDataSource.getCurrentPosition()).thenAnswer((_) async => tPositionDto);
+      // Act
+      final result = await repository.getCurrentPosition();
+      // Assert
+      expect(result, Right(tPosition));
+      verify(mockDataSource.getCurrentPosition());
+      verifyNoMoreInteractions(mockDataSource);
+    });
+
+    test('should return LocationFailure when call to data source throws ServerException', () async {
+      // Arrange
+      when(mockDataSource.getCurrentPosition()).thenThrow(ServerException('Error'));
+      // Act
+      final result = await repository.getCurrentPosition();
+      // Assert
+      expect(result, const Left(LocationFailure('Error')));
+    });
+  });
+
+  group('getPositionStream', () {
+      test('should emit Position when stream emits successfully', () async {
+        // Arrange
+        when(mockDataSource.getPositionStream(intervalMs: anyNamed('intervalMs'), distanceFilterMeters: anyNamed('distanceFilterMeters')))
+            .thenAnswer((_) => Stream.value(tPositionDto));
+        
+        // Act
+        final stream = repository.getPositionStream();
+        
+        // Assert
+        expect(stream, emits(Right(tPositionDto)));
+      });
+
+      test('should emit LocationFailure when stream emits error', () async {
+         // Arrange
+        final controller = StreamController<PositionDto>();
+        when(mockDataSource.getPositionStream(intervalMs: anyNamed('intervalMs'), distanceFilterMeters: anyNamed('distanceFilterMeters')))
+            .thenAnswer((_) => controller.stream);
+
+        // Act
+        final stream = repository.getPositionStream();
+        
+        // Assert
+        expect(stream, emits(isA<Left>()));
+        
+        controller.addError(ServerException('Stream Error'));
+        controller.close();
+      });
+  });
+}
