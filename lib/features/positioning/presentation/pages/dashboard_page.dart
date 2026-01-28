@@ -4,6 +4,8 @@ import '../../../../injection_container.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
+import '../bloc/signal/signal_bloc.dart';
+import '../bloc/signal/signal_event.dart';
 import '../bloc/location_state.dart';
 import '../widgets/position_card.dart';
 import '../widgets/signal_monitor.dart';
@@ -13,8 +15,12 @@ class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<LocationBloc>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => sl<LocationBloc>()),
+        // Inyectamos y arrancamos el escáner inmediatamente para la demo
+        BlocProvider(create: (_) => sl<SignalBloc>()..add(const SignalScanStarted())),
+      ],
       child: const _DashboardView(),
     );
   }

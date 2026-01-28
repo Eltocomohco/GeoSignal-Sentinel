@@ -4,12 +4,13 @@ import 'location_event.dart';
 import 'location_state.dart';
 
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import '../../domain/usecases/get_live_position_usecase.dart';
 
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
-  final LocationRepository _locationRepository;
+  final GetLivePositionUseCase _getLivePosition;
 
-  LocationBloc({required LocationRepository locationRepository})
-      : _locationRepository = locationRepository,
+  LocationBloc({required GetLivePositionUseCase getLivePosition})
+      : _getLivePosition = getLivePosition,
         super(const LocationState()) {
     on<LocationStarted>(_onLocationStarted, transformer: restartable());
     on<LocationStopped>(_onLocationStopped);
@@ -22,7 +23,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     emit(state.copyWith(status: LocationStatus.loading));
 
     await emit.forEach(
-      _locationRepository.getPositionStream(),
+      _getLivePosition(),
       onData: (result) => result.fold(
         (failure) => state.copyWith(
           status: LocationStatus.failure,

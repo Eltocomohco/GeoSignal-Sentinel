@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../../injection_container.dart';
-import '../../domain/entities/wifi_network.dart';
-import '../../domain/repositories/signal_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/signal/signal_bloc.dart';
+import '../bloc/signal/signal_state.dart';
 
 class SignalMonitor extends StatelessWidget {
   const SignalMonitor({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Inyección Directa para visualizar flujo separado (Demo Arquitectónica)
-    // En producción iría en su propio BLoC.
-    final signalRepository = sl<SignalRepository>();
-
     return Card(
       margin: const EdgeInsets.all(16),
       child: Column(
@@ -23,43 +19,46 @@ class SignalMonitor extends StatelessWidget {
           ),
           SizedBox(
             height: 150,
-            child: StreamBuilder(
-              stream: signalRepository.getWifiScanStream(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(child: Text('Error RF: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+            child: BlocBuilder<SignalBloc, SignalState>(
+              builder: (context, state) {
+                if (state.status == SignalStatus.failure) {
+                   return Center(child: Text('Error RF: ${state.errorMessage}', style: const TextStyle(color: Colors.red)));
+                }
+
+                if (state.status == SignalStatus.initial) {
+                   return const Center(child: Text('Monitor Inactivo'));
                 }
                 
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                if (state.networks.isEmpty) {
+                   return const Center(child: Column(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       CircularProgressIndicator(strokeWidth: 2),
+                       SizedBox(height: 8),
+                       Text("Escaneando..."),
+                     ],
+                   ));
                 }
 
-                return snapshot.data!.fold(
-                  (failure) => Center(child: Text(failure.message)), 
-                  (networks) {
-                    if (networks.isEmpty) return const Center(child: Text('Escaneando... (Sin redes)'));
-                    
-                    // Top 5 sorted by Signal Strength
-                    networks.sort((a, b) => b.rssi.compareTo(a.rssi));
-                    final topNetworks = networks.take(5).toList();
+                // Top 5 sorted by strength
+                final topNetworks = List.of(state.networks)..sort((a, b) => b.rssi.compareTo(a.rssi));
+                final displayList = topNetworks.take(5).toList();
 
-                    return ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: topNetworks.length,
-                      separatorBuilder: (_,__) => const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        final net = topNetworks[index];
-                        return ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(Icons.wifi, color: _getRssiColor(net.rssi)),
-                          title: Text(net.ssid.isEmpty ? '[Oculta]' : net.ssid, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          trailing: Text('${net.rssi} dBm', style: const TextStyle(fontFamily: 'Courier')),
-                          subtitle: Text(net.bssid),
-                        );
-                      },
+                return ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: displayList.length,
+                  separatorBuilder: (_,__) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final net = displayList[index];
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(Icons.wifi, color: _getRssiColor(net.rssi)),
+                      title: Text(net.ssid.isEmpty ? '[Oculta]' : net.ssid, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      trailing: Text('${net.rssi} dBm', style: const TextStyle(fontFamily: 'Courier')),
+                      subtitle: Text(net.bssid),
                     );
-                  }
+                  },
                 );
               },
             ),

@@ -1,6 +1,6 @@
 import 'database/app_database.dart';
 import '../../models/position_dto.dart';
-import '../local_location_datasource.dart';
+import 'local_location_datasource.dart';
 
 class DriftLocationDataSource implements LocalLocationDataSource {
   final AppDatabase database;
